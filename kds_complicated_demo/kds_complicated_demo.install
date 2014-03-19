@@ -1,0 +1,114 @@
+<?php
+
+/**
+ * @file
+ * Install file for KDS Complicated demo module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function kds_complicated_demo_install() {
+  $t = get_t();
+
+  // Create a kds_demo content type.
+  $types = array(
+    array(
+      'type' => 'kds_demo_page',
+      'name' => $t('KDS demo page'),
+      'base' => 'node_content',
+      'description' => $t("Use <em>KDS demo pages</em> to test KDS output."),
+      'custom' => 1,
+      'modified' => 1,
+      'locked' => 0,
+    ),
+  );
+  foreach ($types as $type) {
+    $type = node_type_set_defaults($type);
+    node_type_save($type);
+    node_add_body_field($type);
+  }
+
+  // Insert default pre-defined RDF mapping into the database.
+  $rdf_mappings = array(
+    array(
+      'type' => 'node',
+      'bundle' => 'kds_demo_page',
+      'mapping' => array(
+        'rdftype' => array('foaf:Document'),
+      ),
+    ),
+  );
+  foreach ($rdf_mappings as $rdf_mapping) {
+    rdf_mapping_save($rdf_mapping);
+  }
+
+  // Default "KDS demo page" to not be promoted and have comments disabled.
+  variable_set('node_options_kds_demo_page', array('status'));
+  variable_set('comment_kds_demo_page', COMMENT_NODE_HIDDEN);
+
+  // Don't display date and author information on "Basic page" nodes by default.
+  variable_set('node_submitted_kds_demo_page', FALSE);
+
+  // Create a new 'kds_demo_page' node for testing.
+  $node = new stdClass();
+  $node->uid = 1;
+  $node->language = LANGUAGE_NONE;
+  $node->type = 'kds_demo_page';
+  $node->status = 1;
+  $node->promote = 1;
+
+  // Title and body.
+  $node->title = $t('KDS Demo Page');
+  $node->body[$node->language][0]['value'] = $t('This is a test page for the KDS Complicated demo.');
+  $node->body[$node->language][0]['format'] = 'filtered_html';
+  $node->menu = array(
+    'enabled' => 1,
+    'mlid' => 0,
+    'module' => 'menu',
+    'hidden' => 0,
+    'has_children' => 0,
+    'customized' => 0,
+    'options' => array(),
+    'expanded' => 0,
+    'parent_depth_limit' => 8,
+    'link_title' => $t('KDS Demo Page'),
+    'description' => '',
+    'parent' => 'main-menu:0',
+    'weight' => '1',
+    'plid' => '0',
+    'menu_name' => 'main-menu',
+  );
+  node_save($node);
+
+  // Set site frontpage to demo page manager page.
+  variable_set('site_frontpage', 'kds-demo-home');
+}
+
+/**
+ * Implements hook_uninstall().
+ *
+ * Remove the demo content types and content.
+ */
+function kds_complicated_demo_uninstall() {
+  $content_types = array(
+    'kds_demo_page',
+  );
+  // Check if content type exists.
+  foreach ($content_types as $type) {
+    if (node_type_load($type)) {
+      // Get all nodes of type $type.
+      $results = db_select('node', 'n')
+        ->fields('n', array('nid'))
+        ->condition('type', $type)
+        ->execute();
+      // Delete each node.
+      foreach ($results as $result) {
+        node_delete($result->nid);
+      }
+
+      // Delete the content type.
+      node_type_delete($type);
+    }
+  }
+}
