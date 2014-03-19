@@ -32,7 +32,7 @@ projects[environment_indicator][version] = 2.2
 projects[jquery_update][version] = 2.3
 projects[libraries][version] = 2.1
 projects[link][version] = 1.2
-projects[imageapi][version] = 1.x-dev
+; projects[imageapi][version] = 1.x-dev
 projects[metatag][version] = 1.0-beta9
 projects[media][version] = 1.4
 projects[media][patch][] = http://drupal.org/files/issues/media-error-message-when-editing-file-entity-display-options-2171115-1.patch
@@ -44,6 +44,7 @@ projects[token][version] = 1.5
 projects[video_embed_field][version] = 2.0-beta7
 
 ; Additional Contrib Modules.
+projects[admin_menu][version] = 3.0-rc4
 projects[views][version] = 3.7
 projects[features][version] = 2.0
 projects[entityreference][version] = 1.1
