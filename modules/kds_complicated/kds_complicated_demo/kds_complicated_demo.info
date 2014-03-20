@@ -11,6 +11,7 @@ dependencies[] = entity
 ; dependencies[] = features
 dependencies[] = fences
 ; dependencies[] = jquery_update
+dependencies[] = kds_complicated
 ; dependencies[] = libraries
 dependencies[] = page_manager
 dependencies[] = panels

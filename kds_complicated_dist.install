@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Install, update and uninstall functions for the kds_complicated install
+ * Install, update and uninstall functions for the kds_complicated_dist install
  * profile.
  */
 
@@ -12,7 +12,7 @@
  *
  * @see system_install()
  */
-function kds_complicated_install() {
+function kds_complicated_dist_install() {
   // Add text formats.
   $filtered_html_format = array(
     'format' => 'filtered_html',

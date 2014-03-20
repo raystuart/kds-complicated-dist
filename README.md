@@ -1,5 +1,5 @@
-kds-make-complicated
-====================
+KDS Complicated Distribution
+============================
 
 To see if Fredric Mitchell's KDS can survive complications, like Views, Panels, and Features. :)
 

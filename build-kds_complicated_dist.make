@@ -5,11 +5,11 @@ api = 2
 includes[] = drupal-org-core.make
 
 ; Download the KDS Complicated install profile and build all its dependencies:
-projects[kds_complicated][type] = profile
-projects[kds_complicated][subdir] = ./
-projects[kds_complicated][download][type] = git
-projects[kds_complicated][download][url] = git@github.com:raystuart/kds-complicated-make.git
-projects[kds_complicated][download][branch] = 7.x-1.x
+projects[kds_complicated_dist][type] = profile
+projects[kds_complicated_dist][subdir] = ./
+projects[kds_complicated_dist][download][type] = git
+projects[kds_complicated_dist][download][url] = git@github.com:raystuart/kds-complicated-dist.git
+projects[kds_complicated_dist][download][branch] = 7.x-1.x
 
 ; This is a starter profile, let the projects download to the normal sites/all
 ; locations.
