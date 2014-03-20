@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * @file
+ * Functionality for KDS Complicated.
+ */
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function kds_complicated_ctools_plugin_api($owner, $api) {
+  if (($owner == 'panels' && $api == 'layouts') ||
+      ($owner == 'page_manager' && $api == 'pages_default')) {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_panels_new_pane_alter().
+ */
+function kds_complicated_panels_new_pane_alter(&$pane) {
+  // Setup our styles defaults.
+  $link_template = array(
+    'path' => '',
+    'class_enable' => 0,
+    'class' => '',
+    'attributes' => array(),
+    'attributes_array' => array(),
+  );
+  $style_template = array(
+    'type' => '',
+    'class_enable' => 0,
+    'class' => '',
+    'attributes' => array(),
+    'link_enabled' => 0,
+    'link' => $link_template,
+    'attributes_array' => array(),
+  );
+  $pane->style['style'] = 'semantic_panels';
+  $pane->style['settings'] = array(
+    'element_title' => $style_template,
+    'element_content' => $style_template,
+    'element_wrapper' => $style_template,
+    'add_default_classes' => 0,
+  );
+  // Update styles and unset links.
+  $pane->style['settings']['element_content']['type'] = 0;
+  unset($pane->style['settings']['element_wrapper']['link_enabled']);
+  unset($pane->style['settings']['element_wrapper']['link']);
+  $pane->style['settings']['element_wrapper']['type'] = 0;
+
+  // Update the pane depending on the type and subtype.
+  kds_complicated_update_pane_style_defaults($pane);
+}
+
+/**
+ * Update a new pane's styles defaults.
+ */
+function kds_complicated_update_pane_style_defaults(&$pane) {
+  $element_title = &$pane->style['settings']['element_title'];
+  $element_content = &$pane->style['settings']['element_content'];
+  $element_wrapper = &$pane->style['settings']['element_wrapper'];
+
+  switch ($pane->type) {
+    case 'entity_field':
+    case 'node_body':
+      break;
+
+    default:
+      if (strpos($pane->type, 'node_') !== FALSE) {
+        $element_wrapper['type'] = 'div';
+        $element_wrapper['class_enable'] = 1;
+        $element_wrapper['class'] = drupal_html_class($pane->type);
+      }
+      break;
+  }
+}

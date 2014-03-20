@@ -1,0 +1,4 @@
+name = KDS Complicated
+description = Functionality for KDS Complicated.
+core = 7.x
+package = KDS Complicated
