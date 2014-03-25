@@ -57,7 +57,7 @@ projects[panels][patch][1632898] = "http://drupal.org/files/1632898-10.patch"
 ; Impossible to set attributes on Panels panes
 projects[panels][patch][2169571] = "https://drupal.org/files/issues/panels_pane_template_attributes-2169571-1.patch"
 ; Allow the default pane style to be different.
-projects[panels][patch][1985980] = https://drupal.org/files/panels-new-pane-alter-1985980-1.patch
+;projects[panels][patch][1985980] = https://drupal.org/files/panels-new-pane-alter-1985980-1.patch
 
 ; Simplify Views markup.
 projects[fences][version] = 1.0
@@ -65,7 +65,7 @@ projects[semanticviews][version] = 1.x-dev
 
 ; Simplify Panels markup.
 projects[semantic_panels][version] = 1.2
-projects[panels_extra_styles][version] = 1.1
+;projects[panels_extra_styles][version] = 1.1
 
 ; projects[textformatter][version] = 1.3
 ; projects[textformatter][subdir] = "contrib"

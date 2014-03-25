@@ -5,21 +5,109 @@
  * Functionality for KDS Complicated.
  */
 
+// @TODO: Create more constants.
+define('KDS_COMPLICATED_ADD_DEFAULT_CLASSES', 0);
+
 /**
- * Implements hook_ctools_plugin_api().
+ * Implements hook_form_alter().
+ *
+ * Change default values for new Panels panes.
  */
-function kds_complicated_ctools_plugin_api($owner, $api) {
-  if (($owner == 'panels' && $api == 'layouts') ||
-      ($owner == 'page_manager' && $api == 'pages_default')) {
-    return array('version' => 1);
+function kds_complicated_form_alter(&$form, &$form_state, $form_id) {
+
+  // Potential form ids during creating a new variant.
+  // page_manager_handler_add
+  // ctools_context_handler_edit_criteria
+  // ctools_context_handler_edit_context
+  // panels_panel_context_edit_choose THIS ONE
+  // panels_panel_context_edit_settings
+
+  // Set defaults on new displays.
+  if ($form_id == 'panels_panel_context_edit_choose') {
+    // Check if we should be setting KDS defaults.
+    if (variable_get('kds_complicated_set_pane_defaults', TRUE) && isset($form_state['display'])) {
+      $display = &$form_state['display'];
+
+      // Get the panels display style to set as default.
+      $style = variable_get('kds_complicated_panels_display_style', 'semantic_panels');
+
+      // Only set the defaults on new displays.
+      // @TODO: Make sure that if a selection is made that this will not
+      // override it.
+      if (isset($display->did) && $display->did == 'new') {
+        // Set default style to semantic_panels for all new panes.
+        $display->panel_settings['style'] = $style;
+
+        // It should be ok to do just the display settings, since I think
+        // the regions should take the parent settings if not set to anything.
+        // Set each region.
+        /*
+        if (isset($display->panels) && is_array($display->panels)) {
+          foreach ($display->panels as $region => $panes) {
+            if (!isset($display->panel_settings[$region]['style'])) {
+              $display->panel_settings[$region] = array(
+                'style' => $style,
+              );
+            }
+          }
+        }*/
+
+        // Get the settings array or function. @TODO: needed?
+        // $settings = variable_get('kds_complicated_panels_pane_style_settings', 'kds_complicated_panels_pane_style_settings');
+      }
+    }
+  }
+
+  // Set defaults on new panes.
+  if (strpos($form_id, '_content_type_edit_form') === FALSE) {
+    // Check if we should be setting KDS defaults.
+    if (variable_get('kds_complicated_set_pane_defaults', TRUE) && isset($form_state['pane'])) {
+      $pane = &$form_state['pane'];
+
+      // Get the panels pane style to set as default.
+      $style = variable_get('kds_complicated_panels_pane_style', 'semantic_panels');
+
+      // Only set these defaults for new panes.
+      if (isset($pane->pid) && $pane->pid == 'new') {
+        // Set default style to semantic_panels for all new panes.
+        $pane->style = array(
+          'style' => $style,
+        );
+
+        // Get the settings array or function.
+        $settings = variable_get('kds_complicated_panels_pane_style_settings', 'kds_complicated_panels_pane_style_settings');
+
+        // Set the style settings standard defaults.
+        if (is_array($settings)) {
+          $pane->style['settings'] = $settings;
+        }
+        elseif (is_string($settings) && function_exists($settings)) {
+          $pane->style['settings'] = $settings($pane);
+        }
+
+        // Get the settings by type function.
+        $function = variable_get('kds_complicated_panels_pane_style_settings_by_type', 'kds_complicated_panels_pane_style_settings_by_type');
+
+        // Set the style settings defaults by content_type.
+        if (isset($function) && function_exists($function)) {
+          $function($pane);
+        }
+      }
+    }
   }
 }
 
 /**
- * Implements hook_panels_new_pane_alter().
+ * KDS Complicated set panel pane style defaults.
+ *
+ * @param object $pane
+ *   The pane object.
+ *
+ * @return array
+ *   The settings array for the pane style.
  */
-function kds_complicated_panels_new_pane_alter(&$pane) {
-  // Setup our styles defaults.
+function kds_complicated_panels_pane_style_settings($pane) {
+  // Setup the style defaults.
   $link_template = array(
     'path' => '',
     'class_enable' => 0,
@@ -36,27 +124,28 @@ function kds_complicated_panels_new_pane_alter(&$pane) {
     'link' => $link_template,
     'attributes_array' => array(),
   );
-  $pane->style['style'] = 'semantic_panels';
-  $pane->style['settings'] = array(
+  $settings = array(
     'element_title' => $style_template,
     'element_content' => $style_template,
     'element_wrapper' => $style_template,
-    'add_default_classes' => 0,
+    'add_default_classes' => KDS_COMPLICATED_ADD_DEFAULT_CLASSES,
   );
-  // Update styles and unset links.
-  $pane->style['settings']['element_content']['type'] = 0;
-  unset($pane->style['settings']['element_wrapper']['link_enabled']);
-  unset($pane->style['settings']['element_wrapper']['link']);
-  $pane->style['settings']['element_wrapper']['type'] = 0;
+  // Quick changes to set sane defaults by element.
+  $settings['element_content']['type'] = 0;
+  unset($settings['element_wrapper']['link_enabled']);
+  unset($settings['element_wrapper']['link']);
+  $settings['element_wrapper']['type'] = 0;
 
-  // Update the pane depending on the type and subtype.
-  kds_complicated_update_pane_style_defaults($pane);
+  return $settings;
 }
 
 /**
- * Update a new pane's styles defaults.
+ * Update a new panel pane style defaults by content type.
+ *
+ * @param object $pane
+ *   The pane object.
  */
-function kds_complicated_update_pane_style_defaults(&$pane) {
+function kds_complicated_panels_pane_style_settings_by_type(&$pane) {
   $element_title = &$pane->style['settings']['element_title'];
   $element_content = &$pane->style['settings']['element_content'];
   $element_wrapper = &$pane->style['settings']['element_wrapper'];
